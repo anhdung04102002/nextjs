@@ -9,7 +9,7 @@ datasource db {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Product {
-  id               BigInt   @id  // Thêm @id để đánh dấu đây là primary key
+  id               BigInt    BigInt    @id @default(autoincrement()) 
   name             String
   code             String
   slug             String
@@ -32,7 +32,7 @@ model Product {
   tech_spec        String?
 
   @@map("products")
-   @@ignore 
+  @@ignore 
 }
 
 model admin_navigations {
