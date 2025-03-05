@@ -1,0 +1,410 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Product {
+  id               BigInt   @id  // Thêm @id để đánh dấu đây là primary key
+  name             String
+  code             String
+  slug             String
+  contents         String
+  description      String
+  image            String?
+  images           String?
+  cat_id           BigInt
+  status           Int       @db.SmallInt
+  meta_title       String
+  meta_keywords    String
+  meta_description String
+  meta_og_url      String
+  created_at       DateTime? @db.Timestamp(6)
+  updated_at       DateTime? @db.Timestamp(6)
+  video            String?
+  special_info     String?
+  url              String?
+  options          String?
+  tech_spec        String?
+
+  @@map("products")
+   @@ignore 
+}
+
+model admin_navigations {
+  id         BigInt    @id(map: "admin_navigations_PRIMARY")
+  name       String    @db.VarChar(100)
+  slug       String    @unique(map: "admin_navigations_slug_unique") @db.VarChar(50)
+  parent     Int
+  icon       String    @db.VarChar(250)
+  url        String    @db.VarChar(250)
+  status     Int       @db.SmallInt
+  deleted    Int       @db.SmallInt
+  created_at DateTime? @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+}
+
+model banner {
+  id     Int     @id(map: "banner_PRIMARY")
+  image  String
+  status Boolean
+}
+
+model branch {
+  id         BigInt    @id(map: "branch_PRIMARY")
+  name       String    @db.VarChar(255)
+  phone      String?   @db.VarChar(255)
+  type       Int?      @default(1)
+  address    String    @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+  lat        String?
+  lon        String?
+  region     Int       @default(1)
+}
+
+model car_company {
+  id        Int      @id(map: "car_company_PRIMARY")
+  name      String?  @db.VarChar(255)
+  url_image String?  @db.VarChar(255)
+  status    Boolean? @default(true)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model car_model {
+  id         BigInt
+  name       String    @db.VarChar(255)
+  status     Boolean
+  parent     Int
+  updated_at DateTime? @db.Date
+
+  @@ignore
+}
+
+model categories {
+  id               BigInt    @id(map: "categories_PRIMARY")
+  name             String    @db.VarChar(255)
+  slug             String    @unique(map: "categories_slug_unique") @db.VarChar(255)
+  order            Int?
+  type             BigInt
+  description      String?
+  icon             String?
+  image            String?
+  parent           Int
+  status           Int       @db.SmallInt
+  created_at       DateTime? @db.Timestamp(6)
+  updated_at       DateTime? @db.Timestamp(6)
+  meta_title       String?
+  meta_description String?
+}
+
+model comments {
+  id         BigInt    @id(map: "comments_PRIMARY")
+  prd_id     String    @db.VarChar(255)
+  name       String    @db.VarChar(255)
+  code       String    @db.VarChar(255)
+  image      String    @db.VarChar(255)
+  cus_id     BigInt
+  cus_name   String    @db.VarChar(100)
+  content    String    @db.VarChar(100)
+  created_at DateTime? @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+}
+
+model customer {
+  id         Int       @id(map: "customer_PRIMARY")
+  name       String?   @db.VarChar(512)
+  address    String?   @db.VarChar(512)
+  type       Int?
+  lat        Float?
+  lon        Float?
+  province   String?   @db.VarChar(512)
+  district   String?   @db.VarChar(512)
+  updated_at DateTime? @db.Date
+}
+
+model district {
+  id     Int     @id(map: "district_PRIMARY")
+  name   String  @db.VarChar(512)
+  parent Int
+  slug   String? @db.VarChar(200)
+
+  @@index([parent], map: "parent")
+}
+
+model filter {
+  id         Int      @id(map: "filter_PRIMARY")
+  type       Int
+  name       String
+  value      String
+  updated_at DateTime @default(now()) @db.Timestamp(6)
+}
+
+model filter_products {
+  id         Int    @id(map: "filter_products_PRIMARY")
+  id_product BigInt
+  id_filter  Int
+
+  @@index([id_filter], map: "id_filter")
+  @@index([id_product], map: "id_product")
+}
+
+model guide {
+  id         Int    @id(map: "guide_PRIMARY")
+  url        String
+  product_id BigInt
+  updated_at String
+
+  @@index([product_id], map: "product_id")
+}
+
+model library_image {
+  id         Int      @id(map: "library_image_PRIMARY")
+  url        String
+  updated_at DateTime @db.Date
+}
+
+model orders {
+  id          BigInt    @id(map: "orders_PRIMARY")
+  name        String    @db.VarChar(255)
+  code        String    @db.VarChar(255)
+  image       String    @db.VarChar(255)
+  price       Decimal   @db.Decimal(18, 2)
+  quantity    BigInt
+  total       Decimal   @db.Decimal(18, 2)
+  state       Int       @db.SmallInt
+  cus_name    String    @db.VarChar(100)
+  cus_address String    @db.VarChar(100)
+  cus_email   String    @db.VarChar(100)
+  cus_phone   String    @db.VarChar(100)
+  cus_id      BigInt
+  created_at  DateTime? @db.Timestamp(6)
+  updated_at  DateTime? @db.Timestamp(6)
+}
+
+model permissions {
+  id          BigInt    @id(map: "permissions_PRIMARY")
+  name        String    @db.VarChar(255)
+  description String    @db.VarChar(255)
+  created_at  DateTime? @db.Timestamp(6)
+  updated_at  DateTime? @db.Timestamp(6)
+}
+
+model posts {
+  id               BigInt    @id(map: "posts_PRIMARY")
+  name             String    @db.VarChar(191)
+  slug             String    @db.VarChar(255)
+  type_slug        String?
+  content          String?
+  description      String
+  type             String?   @db.VarChar(191)
+  is_featured      Int?
+  featured_image   String?   @db.VarChar(191)
+  file             String?   @db.VarChar(191)
+  meta_og_image    String?   @db.VarChar(191)
+  order            Int?
+  status           Int       @default(1) @db.SmallInt
+  created_by       String?   @db.VarChar(191)
+  published_at     DateTime? @db.Timestamp(6)
+  created_at       DateTime? @db.Timestamp(6)
+  meta_title       String    @db.VarChar(255)
+  meta_keywords    String
+  meta_description String
+  meta_og_url      String
+  updated_at       String?
+  keyphrase        String
+}
+
+model posts_home {
+  id         BigInt   @id(map: "posts_home_PRIMARY")
+  id_post    BigInt
+  updated_at DateTime @db.Date
+
+  @@index([id_post], map: "id_post")
+}
+
+model posts_type {
+  id   Int    @id(map: "posts_type_PRIMARY")
+  name String
+  slug String @db.VarChar(20)
+}
+
+model posts_utour {
+  id               BigInt    @id(map: "posts_utour_PRIMARY")
+  name             String    @db.VarChar(191)
+  slug             String    @db.VarChar(255)
+  content          String?
+  description      String
+  type             Int?
+  is_featured      Int?
+  featured_image   String?   @db.VarChar(191)
+  meta_og_image    String?   @db.VarChar(191)
+  order            Int?
+  status           Int       @default(1) @db.SmallInt
+  created_by       String?   @db.VarChar(191)
+  published_at     DateTime? @db.Timestamp(6)
+  created_at       DateTime? @db.Timestamp(6)
+  meta_title       String    @db.VarChar(255)
+  meta_keywords    String
+  meta_description String
+  meta_og_url      String
+  updated_at       DateTime? @db.Timestamp(6)
+  keyphrase        String
+
+  @@index([type], map: "type")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model product_model {
+  id         Int
+  id_model   BigInt
+  id_product BigInt
+  status     Boolean @default(true)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model product_question {
+  id         BigInt
+  id_product BigInt
+  question   String
+  anwser     String
+  status     Boolean
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model products_utour {
+  id               BigInt
+  name             String
+  code             String
+  slug             String
+  tag              String
+  contents         String
+  description      String
+  image            String?
+  images           String?
+  price            String?
+  featured         Int       @db.SmallInt
+  warranty         String?
+  optionName       String?
+  cat_id           BigInt
+  status           Int       @db.SmallInt
+  order            Int
+  deleted          Int       @db.SmallInt
+  meta_title       String
+  meta_keywords    String
+  meta_description String
+  meta_og_url      String
+  created_at       DateTime? @db.Timestamp(6)
+  updated_at       DateTime? @db.Timestamp(6)
+  info             String
+  special          String?
+  video            String
+  operation        String
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model promotions {
+  id        Int
+  count     Int
+  total     Int
+  time_from DateTime @db.Date
+  time_to   DateTime @db.Date
+  name      String   @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model province {
+  id   Int
+  name String  @db.VarChar(512)
+  type Int
+  slug String? @db.VarChar(200)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model question_client {
+  id       Int
+  question String
+  anwser   String
+  type     String
+  status   Boolean
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model register {
+  id          BigInt
+  name        String
+  phone       String
+  name_branch String
+  address     String
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model review_master {
+  id          Int
+  url         String
+  updated_at  Int
+  order       Int?
+  image       String?
+  description String?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model roles {
+  id         BigInt
+  user_id    BigInt
+  nav_id     BigInt
+  created_at DateTime? @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model send_message_info {
+  id          BigInt
+  cus_name    String    @db.VarChar(150)
+  cus_phone   String    @db.VarChar(13)
+  cus_address String    @db.VarChar(255)
+  content     String
+  created_at  DateTime? @db.Timestamp(6)
+  updated_at  DateTime? @db.Timestamp(6)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model users {
+  id         BigInt
+  address    String?   @db.VarChar(255)
+  password   String    @db.VarChar(255)
+  full_name  String    @db.VarChar(100)
+  email      String?   @db.VarChar(255)
+  phone      String    @db.VarChar(255)
+  status     Int       @default(1) @db.SmallInt
+  deleted    Int       @default(0) @db.SmallInt
+  per_id     Int       @db.SmallInt
+  created_at DateTime? @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+
+  @@ignore
+}
