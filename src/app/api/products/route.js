@@ -34,30 +34,123 @@ export async function GET() {
 export async function POST(request) {
   try {
     const body = await request.json()
-    const { name, price, description } = body
+    const product = await prisma.product.create({
+      data: {
+        id: BigInt(Date.now()),  // Tạo id từ timestamp
+        name: body.name,
+        code: body.code,
+        slug: body.slug,
+        contents: body.contents,
+        description: body.description,
+        image: body.image,
+        images: body.images,
+        cat_id: BigInt(body.cat_id),
+        status: body.status,
+        meta_title: body.meta_title,
+        meta_keywords: body.meta_keywords,
+        meta_description: body.meta_description,
+        meta_og_url: body.meta_og_url,
+        video: body.video,
+        special_info: body.special_info,
+        url: body.url,
+        options: body.options,
+        tech_spec: body.tech_spec,
+        created_at: new Date(),
+        updated_at: new Date()
+      }
+    })
 
-    if (!name || !price) {
+    const serializedProduct = {
+      ...product,
+      id: product.id.toString(),
+      cat_id: product.cat_id.toString()
+    }
+
+    return NextResponse.json(
+      { 
+        message: 'Tạo sản phẩm thành công', 
+        product: serializedProduct 
+      },
+      { status: 201 }
+    )
+  } catch (error) {
+    console.error('Lỗi khi tạo sản phẩm:', error)
+    return NextResponse.json(
+      { error: 'Lỗi khi tạo sản phẩm', details: error.message },
+      { status: 500 }
+    )
+  }
+}
+
+export async function PUT(request) {
+  try {
+    const body = await request.json()
+    const { id, ...updateData } = body
+
+    if (!id) {
       return NextResponse.json(
-        { error: 'Thiếu thông tin bắt buộc' },
+        { error: 'Thiếu ID sản phẩm' },
         { status: 400 }
       )
     }
 
-    const product = await prisma.product.create({
+    const product = await prisma.product.update({
+      where: {
+        id: BigInt(id)
+      },
       data: {
-        name,
-        price: Number(price),
-        description
+        ...updateData,
+        cat_id: updateData.cat_id ? BigInt(updateData.cat_id) : undefined,
+        updated_at: new Date()
       }
     })
 
-    return NextResponse.json(
-      { message: 'Tạo thành công', product },
-      { status: 201 }
-    )
+    const serializedProduct = {
+      ...product,
+      id: product.id.toString(),
+      cat_id: product.cat_id.toString()
+    }
+
+    return NextResponse.json({
+      message: 'Cập nhật sản phẩm thành công',
+      product: serializedProduct
+    })
   } catch (error) {
+    console.error('Lỗi khi cập nhật sản phẩm:', error)
     return NextResponse.json(
-      { error: 'Lỗi khi tạo sản phẩm' },
+      { error: 'Lỗi khi cập nhật sản phẩm', details: error.message },
+      { status: 500 }
+    )
+  }
+}
+
+
+// DELETE - Xóa sản phẩm theo ID
+export async function DELETE(request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Thiếu ID sản phẩm' },
+        { status: 400 }
+      )
+    }
+
+    await prisma.product.delete({
+      where: {
+        id: BigInt(id)
+      }
+    })
+
+    return NextResponse.json({
+      message: 'Xóa sản phẩm thành công'
+    })
+  } catch (error) {
+    console.error('Lỗi khi xóa sản phẩm:', error)
+    return NextResponse.json(
+      { error: 'Lỗi khi xóa sản phẩm', details: error.message },
       { status: 500 }
     )
   }
